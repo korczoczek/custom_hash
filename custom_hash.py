@@ -106,8 +106,9 @@ if __name__ == "__main__":
     else:
         while True:
             hex_init=f"{message}{sep}{getAddon(i,divider,list)}"
-            if i%(divider**3)==0:
+            if time.time()-curr>1:
                 print(f"\r{hex_init}",end=" ")
+                curr=time.time()
             hex=hashlib.sha256(hex_init.encode()).hexdigest()
             if hex.startswith(key[0]):
                 count=charStartCount(hex,key)
