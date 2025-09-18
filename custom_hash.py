@@ -32,8 +32,9 @@ def charScatterCount(str:str,char:str) -> int:
     count=0
     char_len=len(char)
     for i in range(len(str)-(char_len-1)):
-        if charStartCount(str[i:i+char_len],char)==char_len:
-            count+=1
+        if str[i]==char[0]:
+            if charStartCount(str[i:i+char_len],char)==char_len:
+                count+=1
     return count
 
 def baseXToInt(baseX:str,list:str) -> int:
@@ -59,6 +60,7 @@ if __name__ == "__main__":
     parser=argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-s","--scatter",action="store_true",help="Find as many instances of the given key scattered through the string, instead of just at the beginning")
     parser.add_argument("-a","--all",action="store_true",help="Find as many examples at the current depth")
+    parser.add_argument("-c","--count",action="store",type=int,nargs="?",default=0,help="Starting count")
     parser.add_argument('message', metavar="message",type=str,nargs="?",default="",help="Starting content of the message")
     parser.add_argument("key",metavar="key",type=str,nargs="?",default="0",help="Key to be found in the resulting hash")
     parser.add_argument("index",metavar="index",type=str,nargs="?",default="0",help="Starting index of the search in base62")
@@ -84,39 +86,39 @@ if __name__ == "__main__":
     else:
         sep=" "
     
-    max=0
-    if args.all:
-        max=1
+    max=args.count
+
+    if not args.all:
+        max-=1
+
+    if max<0:
+        max=0
+    
 
     curr=time.time()
-    if args.scatter:
+    
+    try:
         while True:
             hex_init=f"{message}{sep}{getAddon(i,divider,list)}"
             if time.time()-curr>1:
                 print(f"\r{hex_init}",end=" ")
                 curr=time.time()
             hex=hashlib.sha256(hex_init.encode()).hexdigest()
-            count=charScatterCount(hex,key)
-            if (count>=max and args.all) or ((count>max and not args.all)):
-                max=count
-                print(f"\rFound sha256 hash with {max} instances of key \"{key}\"")
-                print(hex_init)
-                print(hex)
-            i+=1
-    else:
-        while True:
-            hex_init=f"{message}{sep}{getAddon(i,divider,list)}"
-            if time.time()-curr>1:
-                print(f"\r{hex_init}",end=" ")
-                curr=time.time()
-            hex=hashlib.sha256(hex_init.encode()).hexdigest()
-            if hex.startswith(key[0]):
-                count=charStartCount(hex,key)
+            if args.scatter:
+                count=charScatterCount(hex,key)
             else:
-                count=0
+                if hex.startswith(key[0]):
+                    count=charStartCount(hex,key)
+                else:
+                    count=0
             if (count>=max and args.all) or ((count>max and not args.all)):
                 max=count
-                print(f"\rFound sha256 hash starting with \"{hex[:max]}\" ({max} characters):")
+                if args.scatter:
+                    print(f"\rFound sha256 hash with {max} instances of key \"{key}\"")
+                else:
+                    print(f"\rFound sha256 hash starting with \"{hex[:max]}\" ({max} characters):")
                 print(hex_init)
                 print(hex)
             i+=1
+    except KeyboardInterrupt as e:
+        print(f"\n{e}")
