@@ -60,7 +60,7 @@ if __name__ == "__main__":
     parser=argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("-s","--scatter",action="store_true",help="Find as many instances of the given key scattered through the string, instead of just at the beginning")
     parser.add_argument("-a","--all",action="store_true",help="Find as many examples at the current depth")
-    parser.add_argument("-c","--count",action="store",type=int,nargs="?",default=0,help="Starting count")
+    parser.add_argument("-c","--count",action="store",type=int,nargs="?",default=1,help="Starting count")
     parser.add_argument('message', metavar="message",type=str,nargs="?",default="",help="Starting content of the message")
     parser.add_argument("key",metavar="key",type=str,nargs="?",default="0",help="Key to be found in the resulting hash")
     parser.add_argument("index",metavar="index",type=str,nargs="?",default="0",help="Starting index of the search in base62")
